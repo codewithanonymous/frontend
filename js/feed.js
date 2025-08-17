@@ -52,26 +52,21 @@ class SnapFeed {
         this.init();
     }
 
-   initializeSocket() {
+ // In your frontend JavaScript (feed.js or similar)
+initializeSocket() {
     try {
         console.log('Initializing socket connection...');
         this.socket = io(API_BASE_URL, {
             withCredentials: true,
+            auth: {  // Add token here
+                token: this.token  // This should be your JWT token from localStorage
+            },
             extraHeaders: {
                 "Authorization": `Bearer ${this.token}`
             }
         });
 
-        this.socket.on('connect', () => {
-            console.log('Connected to WebSocket server');
-        });
-
-        this.socket.on('disconnect', () => {
-            console.log('Disconnected from WebSocket server');
-        });
-
-        // Add other socket event listeners here
-        // Example: this.socket.on('newSnap', this.handleNewSnap.bind(this));
+        // Rest of your socket initialization...
     } catch (error) {
         console.error('Socket initialization error:', error);
     }
