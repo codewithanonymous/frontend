@@ -34,43 +34,29 @@ class SnapFeed {
             return;
         }
         
+        // Initialize socket connection
+        this.initializeSocket();
+        
         this.init();
     }
 
-    init() {
-        console.log('Initializing SnapFeed...');
-        console.log('User token exists:', !!this.token);
-        
+    initializeSocket() {
         try {
-            this.setupEventListeners();
-            console.log('Event listeners set up');
-            
-            this.initializeSocket();
-            console.log('Socket initialized');
-            
-            this.loadFeed().catch(error => {
-                console.error('Error in loadFeed:', error);
-                this.showError('Failed to load feed. Please refresh the page.');
+            console.log('Initializing socket connection...');
+            this.socket = io(API_BASE_URL, {
+                withCredentials: true,
+                extraHeaders: {
+                    "Authorization": `Bearer ${this.token}`
+                }
             });
-            
-            this.setupScrollTracking();
-            console.log('Scroll tracking set up');
-            
-            this.displayUsername();
-            console.log('Username displayed');
-        } catch (error) {
-            console.error('Error during initialization:', error);
-            this.showError('Failed to initialize the feed.');
-        }
-    }
 
-    setupEventListeners() {
-        // Logout functionality
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', this.handleLogout.bind(this));
-        }
-        
+            this.socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+            });
+
+            this.socket.on('disconnect', () => {
+                console.log('Disconnected from WebSocket server');
+            });
         // Refresh feed
         const refreshFeedBtn = document.getElementById('refreshFeed');
         if (refreshFeedBtn) {
