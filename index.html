@@ -848,7 +848,8 @@
                         const requestBody = { username, password };
                         console.log('Login request body:', requestBody);
                         
-                        const response = await fetch('/api/login', {
+                        const response = await fetch(`${config.API_BASE_URL}/api/login`, {
+    method: 'POST',
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
