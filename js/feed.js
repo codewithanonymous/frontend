@@ -1,6 +1,18 @@
 // feed.js - Client-side logic for the SnapShare feed page
 // Import config
 const API_BASE_URL = window.config ? config.API_BASE_URL : '';
+// In feed.js
+const SOCKET_URL = API_BASE_URL ? API_BASE_URL : window.location.origin;
+
+// Then in initializeSocket()
+this.socket = io(SOCKET_URL, {
+    withCredentials: true,
+    path: '/socket.io/',  // Make sure this matches your server config
+    transports: ['websocket', 'polling'],
+    extraHeaders: {
+        "Authorization": `Bearer ${this.token}`
+    }
+});
 
 class SnapFeed {
     constructor() {
