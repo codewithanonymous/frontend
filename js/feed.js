@@ -1,4 +1,6 @@
 // feed.js - Client-side logic for the SnapShare feed page
+// Import config
+const API_BASE_URL = window.config ? config.API_BASE_URL : '';
 
 class SnapFeed {
     constructor() {
@@ -204,7 +206,7 @@ class SnapFeed {
             
             try {
                 // Try /api/feed first
-                endpoint = `/api/feed?page=${this.page}&limit=${this.pageSize}`;
+              endpoint = `${config.API_BASE_URL}/api/feed?page=${this.page}&limit=${this.pageSize}`;
                 console.log('Attempting to fetch from:', endpoint);
                 response = await this.fetchWithAuth(endpoint);
                 console.log('Response status:', response.status);
@@ -212,7 +214,7 @@ class SnapFeed {
                 // If 404, try the legacy /api/snaps endpoint
                 if (response.status === 404) {
                     console.log('Feed endpoint not found, trying legacy snaps endpoint...');
-                    endpoint = '/api/snaps';
+                  endpoint = `${config.API_BASE_URL}/api/snaps`;
                     console.log('Attempting to fetch from:', endpoint);
                     response = await this.fetchWithAuth(endpoint);
                     console.log('Legacy endpoint response status:', response.status);
@@ -417,9 +419,9 @@ class SnapFeed {
         }
         
         // If it's an API endpoint, return as is (don't add /uploads/)
-        if (url.startsWith('/api/')) {
-            return url;
-        }
+     if (url.startsWith('/api/') || url.startsWith(config.API_BASE_URL + '/api/')) {
+    return url.startsWith('http') ? url : config.API_BASE_URL + url;
+}
         
         // Remove any leading/trailing slashes
         let path = url.trim().replace(/^[\\/]+|[\\/]+$/g, '');
@@ -726,14 +728,14 @@ class SnapFeed {
             }, 500);
             
             // Mark as viewed on server
-            const response = await fetch(`/api/snap/view`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ snapId })
-            });
+     const response = await fetch(`${config.API_BASE_URL}/api/snap/view`, {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ snapId })
+});
 
             // Check for unauthorized status codes and redirect
             if (response.status === 401 || response.status === 403) {
