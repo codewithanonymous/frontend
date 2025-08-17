@@ -40,23 +40,30 @@ class SnapFeed {
         this.init();
     }
 
-    initializeSocket() {
-        try {
-            console.log('Initializing socket connection...');
-            this.socket = io(API_BASE_URL, {
-                withCredentials: true,
-                extraHeaders: {
-                    "Authorization": `Bearer ${this.token}`
-                }
-            });
+   initializeSocket() {
+    try {
+        console.log('Initializing socket connection...');
+        this.socket = io(API_BASE_URL, {
+            withCredentials: true,
+            extraHeaders: {
+                "Authorization": `Bearer ${this.token}`
+            }
+        });
 
-            this.socket.on('connect', () => {
-                console.log('Connected to WebSocket server');
-            });
+        this.socket.on('connect', () => {
+            console.log('Connected to WebSocket server');
+        });
 
-            this.socket.on('disconnect', () => {
-                console.log('Disconnected from WebSocket server');
-            });
+        this.socket.on('disconnect', () => {
+            console.log('Disconnected from WebSocket server');
+        });
+
+        // Add other socket event listeners here
+        // Example: this.socket.on('newSnap', this.handleNewSnap.bind(this));
+    } catch (error) {
+        console.error('Socket initialization error:', error);
+    }
+}
         // Refresh feed
         const refreshFeedBtn = document.getElementById('refreshFeed');
         if (refreshFeedBtn) {
