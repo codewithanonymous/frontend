@@ -64,14 +64,24 @@ class SnapFeed {
         console.error('Socket initialization error:', error);
     }
 }
-        // Refresh feed
-        const refreshFeedBtn = document.getElementById('refreshFeed');
-        if (refreshFeedBtn) {
-            refreshFeedBtn.addEventListener('click', this.refreshFeed.bind(this));
-        }
+
+// Add this method to your class
+setupRefreshButton() {
+    const refreshFeedBtn = document.getElementById('refreshFeed');
+    if (refreshFeedBtn) {
+        refreshFeedBtn.addEventListener('click', () => {
+            this.refreshFeed();
+        });
     }
+}
 
-
+// Then call it in your init() method
+init() {
+    // ... existing init code ...
+    this.initializeSocket();
+    this.setupRefreshButton();
+    // ... rest of init code ...
+}
     
     setupScrollTracking() {
         // Existing scroll tracking code
