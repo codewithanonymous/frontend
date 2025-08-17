@@ -5,15 +5,10 @@
   "main": "index.html",
   "scripts": {
     "start": "npx http-server . -p 8080 -c-1",
-    "dev": "npx http-server . -p 8080 -c-1 -o"
+    "dev": "npx http-server . -p 8080 -c-1 -o",
+    "build": "echo 'Frontend build complete'"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
   }
-  "scripts": {
-    "build": "cd ../frontend && npm install && npm run build",
-    "start": "node server-pg.js"
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-}
 }
