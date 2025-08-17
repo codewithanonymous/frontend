@@ -945,7 +945,7 @@
                         const requestBody = { username, email, password };
                         console.log('Request body:', requestBody);
                         
-                        const response = await fetch('/api/signup', {
+                        const response = await fetch(`${config.API_BASE_URL}/api/signup`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
