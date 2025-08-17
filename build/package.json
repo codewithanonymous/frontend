@@ -10,4 +10,8 @@
   "devDependencies": {
     "http-server": "^14.1.1"
   }
+  "scripts": {
+    "build": "cd ../frontend && npm install && npm run build",
+    "start": "node server-pg.js"
+}
 }
