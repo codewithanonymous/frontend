@@ -441,7 +441,8 @@
                 console.log('Sending upload request to /api/snaps...');
                 
                 const startTime = performance.now();
-                const response = await fetch('/api/snaps', {
+             const response = await fetch(`${config.API_BASE_URL}/api/snaps`, {
+    method: 'POST',
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${userData.token}`,
