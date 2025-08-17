@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snapchat Clone - Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Welcome to Snapchat Clone</h1>
+            <p>Connect with friends and share moments in real-time</p>
+        </div>
+
+        <!-- Forms Container -->
+        <div class="form-container">
+            <div id="message-container" class="message-container"></div>
+            
+            <!-- Toggle Switch -->
+            <div class="form-toggle-container">
+                <div class="form-toggle">
+                    <button class="toggle-btn active" id="toggle-login">Sign In</button>
+                    <button class="toggle-btn" id="toggle-signup">Sign Up</button>
+                    <div class="toggle-indicator"></div>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="form-card form-active">
+                <h2 class="form-title">Sign In</h2>
+                
+                <div class="form-group">
+                    <div class="input-label">Your Email Address</div>
+                    <input type="text" id="login-email" placeholder="Email" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-label">Your Password</div>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                    <i class="fas fa-lock"></i>
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('login-password')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="btn btn-google">
+                        <i class="fab fa-google"></i> Continue with Google
+                    </button>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="form-card">
+                <h2 class="form-title">Create Account</h2>
+                <p class="form-subtitle">Join our community today</p>
+                
+                <div class="form-group">
+                    <div class="input-label">Username</div>
+                    <input type="text" id="signup-username" placeholder="Choose a username" required>
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-label">Email Address</div>
+                    <input type="email" id="signup-email" placeholder="your@email.com" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-label">Password</div>
+                    <input type="password" id="signup-password" placeholder="••••••••" required>
+                    <i class="fas fa-lock"></i>
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signup-password')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-label">Confirm Password</div>
+                    <input type="password" id="signup-confirm-password" placeholder="••••••••" required>
+                    <i class="fas fa-lock"></i>
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('signup-confirm-password')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+                
+                <div class="terms">
+                    By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

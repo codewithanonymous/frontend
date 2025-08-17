@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Path Debugger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .image-container {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border: 1px solid #eee;
+        }
+        img {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>Image Path Debugger</h1>
+    <div id="test-results">Running tests...</div>
+    <div id="test-cases"></div>
+
+    <script>
+        async function testImagePaths() {
+            const response = await fetch('/api/debug/image-paths');
+            const data = await response.json();
+            
+            const testCases = document.getElementById('test-cases');
+            testCases.innerHTML = '';
+            
+            data.testPaths.forEach((test, index) => {
+                const testCase = document.createElement('div');
+                testCase.className = 'test-case';
+                
+                const img = document.createElement('img');
+                // Use a placeholder image service that returns 200 for any path
+                img.src = `https://via.placeholder.com/200x200?text=${encodeURIComponent(test.normalized)}`;
+                img.alt = `Test image: ${test.normalized}`;
+                
+                // Also try to load the actual URL to see if it exists
+                const testImg = new Image();
+                testImg.onload = () => {
+                    img.className = 'success';
+                    testCase.innerHTML += `<div class="status success">✓ Path is valid and image loads</div>`;
+                };
+                testImg.onerror = () => {
+                    img.className = 'warning';
+                    testCase.innerHTML += `
+                        <div class="status warning">⚠ Path is valid but image not found</div>
+                        <div>Expected at: <code>${test.url}</code></div>
+                    `;
+                };
+                testImg.src = test.normalized;
+                
+                testCase.innerHTML = `
+                    <h3>Test Case ${index + 1}</h3>
+                    <p><strong>Original:</strong> <code>${test.original}</code></p>
+                    <p><strong>Normalized:</strong> <code>${test.normalized}</code></p>
+                    <p><strong>Full URL:</strong> <code>${test.url}</code></p>
+                    <div class="image-container">
+                        <p>Preview with placeholder service (always shows):</p>
+                        ${img.outerHTML}
+                        <p>Actual URL test (may fail):</p>
+                        <div id="test-${index}">Testing actual URL...</div>
+                    </div>
+                    <pre>${JSON.stringify(test, null, 2)}</pre>
+                `;
+                
+                testCases.appendChild(testCase);
+                document.getElementById(`test-${index}`).appendChild(testImg);
+            });
+            
+            document.getElementById('test-results').innerHTML = `
+                <h2>Server Information</h2>
+                <p><strong>Working Directory:</strong> ${data.workingDirectory}</p>
+                <p><strong>__dirname:</strong> ${data.__dirname}</p>
+                <hr>
+                <h2>Test Results (${data.testPaths.length} test cases)</h2>
+            `;
+        }
+        
+        // Run the tests when the page loads
+        window.onload = testImagePaths;
+    </script>
+</body>
+</html>

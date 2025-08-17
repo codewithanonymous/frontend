@@ -1,0 +1,361 @@
+/* SnapFeed Component - Instagram Style Feed */
+:root {
+  --primary-color: #0095f6;
+  --danger-color: #ed4956;
+  --text-primary: #262626;
+  --text-secondary: #8e8e8e;
+  --bg-color: #f9f9f9;
+  --card-bg: #ffffff;
+  --border-color: #dbdbdb;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --border-radius: 10px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --header-height: 54px;
+  --max-mobile-width: 360px;
+  --image-max-height: 360px;
+}
+
+/* Base Styles */
+.snap-feed {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.4;
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Header */
+.snap-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+  z-index: 100;
+  box-shadow: var(--shadow);
+  max-width: var(--max-mobile-width);
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.snap-header__user {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.snap-header__remaining {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Header center section */
+.snap-header__center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Upload Snap Button */
+.upload-snap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: #0095f6;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.upload-snap-btn:hover {
+  background-color: #0077c2;
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.upload-snap-btn:active {
+  transform: translateY(0);
+  background-color: #0066a7;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Center alignment in header */
+.snap-header__center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+/* Logout button */
+.snap-header__logout {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+
+.snap-header__logout:active {
+  background-color: rgba(237, 73, 86, 0.1);
+}
+
+/* Feed Container */
+.snap-feed__container {
+  padding: calc(var(--header-height) + var(--spacing-md)) 0 0;
+  max-width: var(--max-mobile-width);
+  margin: 0 auto;
+  background-color: var(--bg-color);
+}
+
+/* Empty State */
+.snap-feed__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--text-secondary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.snap-feed__empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.8;
+}
+
+/* Snap Card */
+.snap-card {
+  background: var(--card-bg);
+  border-radius: 0;
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-lg);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 100%;
+  width: 100%;
+}
+
+.snap-card:active {
+  transform: scale(0.99);
+  opacity: 0.9;
+}
+
+@media (min-width: 480px) {
+  .snap-card {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+  }
+}
+
+.snap-card__header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.snap-card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: var(--spacing-md);
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.snap-card__username {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.snap-card__image-container {
+  position: relative;
+  width: 100%;
+  max-height: var(--image-max-height);
+  background-color: #f8f8f8;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snap-card__image {
+  width: 100%;
+  height: auto;
+  max-height: var(--image-max-height);
+  object-fit: contain;
+  background-color: #fafafa;
+  transition: transform 0.3s ease;
+  border-radius: 4px;
+}
+
+.snap-card__content {
+  padding: var(--spacing-md);
+  background: var(--card-bg);
+}
+
+.snap-card__caption {
+  margin: var(--spacing-sm) 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.snap-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  gap: var(--spacing-sm);
+}
+
+.snap-card__hashtags {
+  color: #00376b;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.snap-card__hashtags:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.snap-card__location {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--spacing-xs);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.snap-card__location::before {
+  content: '📍';
+  margin-right: 4px;
+}
+
+.snap-card__time {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Loading State */
+.snap-feed__loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.snap-feed__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error State */
+.snap-feed__error {
+  background-color: #fff5f5;
+  color: var(--danger-color);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin: var(--spacing-md) 0;
+  text-align: center;
+  font-size: 0.9rem;
+  border: 1px solid rgba(237, 73, 86, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (min-width: 768px) {
+  .snap-feed__container {
+    padding: calc(var(--header-height) + var(--spacing-lg)) var(--spacing-lg) var(--spacing-lg);
+  }
+  
+  .snap-card {
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+/* Swipeable Container (for future implementation) */
+.snap-swipeable {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.snap-swipeable__track {
+  display: flex;
+  transition: transform 0.3s ease-out;
+  width: 100%;
+}
+
+.snap-swipeable__slide {
+  flex: 0 0 100%;
+  width: 100%;
+}
