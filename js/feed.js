@@ -7,8 +7,6 @@ const SOCKET_URL = 'https://kitsflickbackend.onrender.com'; // Replace with your
 
 class SnapFeed {
     constructor() {
-        // ... existing constructor code ...
-
         // Initialize properties
         this.token = localStorage.getItem('token') || (this.user && this.user.token);
         this.socket = null;
@@ -17,6 +15,7 @@ class SnapFeed {
         this.hasMore = true;
         this.page = 1;
         this.pageSize = 10;
+        this.user = JSON.parse(localStorage.getItem('user') || '{}');
         
         // Authentication check
         if (!this.token) {
@@ -24,8 +23,15 @@ class SnapFeed {
             return;
         }
         
-        this.initializeSocket(); // Initialize socket in constructor
+        this.initializeSocket();
         this.init();
+    }
+
+    init() {
+        this.setupRefreshButton();
+        this.setupScrollTracking();
+        this.loadFeed();
+        this.displayUsername();
     }
 
     initializeSocket() {
@@ -37,20 +43,33 @@ class SnapFeed {
                 withCredentials: true,
                 auth: {
                     token: this.token
+                },
+                extraHeaders: {
+                    "Authorization": `Bearer ${this.token}`
                 }
             });
 
             this.socket.on('connect', () => {
                 console.log('Connected to WebSocket server');
                 console.log('Socket ID:', this.socket.id);
+                this.updateConnectionStatus(true);
             });
 
             this.socket.on('connect_error', (error) => {
                 console.error('Socket connection error:', error);
+                this.updateConnectionStatus(false);
             });
 
             this.socket.on('disconnect', (reason) => {
                 console.log('Disconnected from WebSocket server:', reason);
+                this.updateConnectionStatus(false);
+            });
+
+            this.socket.on('newSnap', (snapData) => {
+                // Don't show snaps from the current user
+                if (snapData.postedBy !== (this.user && this.user.id)) {
+                    this.showNewSnapAlert();
+                }
             });
 
         } catch (error) {
@@ -58,97 +77,17 @@ class SnapFeed {
         }
     }
 
-    // ... rest of your class methods ...
-}
-        
- // Initialize properties
-this.token = localStorage.getItem('token') || (this.user && this.user.token);
-this.socket = null;
-this.viewedSnaps = new Set();
-this.isLoading = false;
-this.hasMore = true;
-this.page = 1;
-this.pageSize = 10;
-
-// Authentication check
-if (!this.token) {
-    window.location.href = '/';
-    // The function will naturally end after the redirect
-} else {
-    // Initialize socket connection only if we have a token
-    this.initializeSocket();
-    this.init();
-}
-initializeSocket() {
-    try {
-        console.log('Initializing socket connection...');
-        this.socket = io(API_BASE_URL, {
-            withCredentials: true,
-            auth: {  // Add token here
-                token: this.token  // This should be your JWT token from localStorage
-            },
-            extraHeaders: {
-                "Authorization": `Bearer ${this.token}`
-            }
-        });
-
-        // Rest of your socket initialization...
-    } catch (error) {
-        console.error('Socket initialization error:', error);
+    setupRefreshButton() {
+        const refreshFeedBtn = document.getElementById('refreshFeed');
+        if (refreshFeedBtn) {
+            refreshFeedBtn.addEventListener('click', () => {
+                this.refreshFeed();
+            });
+        }
     }
-}
-
-// Add this method to your class
-setupRefreshButton() {
-    const refreshFeedBtn = document.getElementById('refreshFeed');
-    if (refreshFeedBtn) {
-        refreshFeedBtn.addEventListener('click', () => {
-            this.refreshFeed();
-        });
-    }
-}
-
-// Then call it in your init() method
-init() {
-    // ... existing init code ...
-    this.initializeSocket();
-    this.setupRefreshButton();
-    // ... rest of init code ...
-}
     
     setupScrollTracking() {
-        // Existing scroll tracking code
         window.addEventListener('scroll', this.checkViewedSnaps.bind(this));
-    }
-
-    initializeSocket() {
-        this.socket = io({
-            auth: {
-                token: this.token
-            }
-        });
-
-        this.socket.on('connect', () => {
-            console.log('Connected to server');
-            this.updateConnectionStatus(true);
-        });
-
-        this.socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            this.updateConnectionStatus(false);
-        });
-
-        this.socket.on('newSnap', (snapData) => {
-            // Don't show snaps from the current user
-            if (snapData.postedBy !== this.user.id) {
-                this.showNewSnapAlert();
-            }
-        });
-
-        this.socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-            this.updateConnectionStatus(false);
-        });
     }
 
     updateConnectionStatus(connected) {
