@@ -61,20 +61,25 @@ class SnapFeed {
     // ... rest of your class methods ...
 }
         
-        // Initialize properties
-        this.token = localStorage.getItem('token') || (this.user && this.user.token);
-        this.socket = null;
-        this.viewedSnaps = new Set();
-        this.isLoading = false;
-        this.hasMore = true;
-        this.page = 1;
-        this.pageSize = 10;
-        
-        // Authentication check
-        if (!this.token) {
-            window.location.href = '/';
-            return;
-        }
+ // Initialize properties
+this.token = localStorage.getItem('token') || (this.user && this.user.token);
+this.socket = null;
+this.viewedSnaps = new Set();
+this.isLoading = false;
+this.hasMore = true;
+this.page = 1;
+this.pageSize = 10;
+
+// Authentication check
+if (!this.token) {
+    window.location.href = '/';
+    // Remove the return statement here as it's not needed in a constructor
+    // The function will naturally end after the redirect
+} else {
+    // Initialize socket connection only if we have a token
+    this.initializeSocket();
+    this.init();
+}
         
         // Initialize socket connection
         this.initializeSocket();
