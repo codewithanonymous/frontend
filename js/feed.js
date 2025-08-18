@@ -1,35 +1,65 @@
 // feed.js - Client-side logic for the SnapShare feed page
 // Import config
 const API_BASE_URL = window.config ? config.API_BASE_URL : '';
-// In feed.js
-const SOCKET_URL = API_BASE_URL ? API_BASE_URL : window.location.origin;
 
-// Then in initializeSocket()
-this.socket = io(SOCKET_URL, {
-    withCredentials: true,
-    path: '/socket.io/',  // Make sure this matches your server config
-    transports: ['websocket', 'polling'],
-    extraHeaders: {
-        "Authorization": `Bearer ${this.token}`
-    }
-});
+// Socket.IO connection URL - Use your Render backend URL directly
+const SOCKET_URL = 'https://kitsflickbackend.onrender.com'; // Replace with your actual backend URL
 
 class SnapFeed {
     constructor() {
-        // Try to get user data first
-        this.user = {};
-        try {
-            const userData = localStorage.getItem('user');
-            if (userData) {
-                this.user = JSON.parse(userData);
-            }
-        } catch (e) {
-            console.error('Error parsing user data:', e);
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
+        // ... existing constructor code ...
+
+        // Initialize properties
+        this.token = localStorage.getItem('token') || (this.user && this.user.token);
+        this.socket = null;
+        this.viewedSnaps = new Set();
+        this.isLoading = false;
+        this.hasMore = true;
+        this.page = 1;
+        this.pageSize = 10;
+        
+        // Authentication check
+        if (!this.token) {
             window.location.href = '/';
             return;
         }
+        
+        this.initializeSocket(); // Initialize socket in constructor
+        this.init();
+    }
+
+    initializeSocket() {
+        try {
+            console.log('Initializing socket connection to:', SOCKET_URL);
+            this.socket = io(SOCKET_URL, {
+                path: '/socket.io/',
+                transports: ['websocket', 'polling'],
+                withCredentials: true,
+                auth: {
+                    token: this.token
+                }
+            });
+
+            this.socket.on('connect', () => {
+                console.log('Connected to WebSocket server');
+                console.log('Socket ID:', this.socket.id);
+            });
+
+            this.socket.on('connect_error', (error) => {
+                console.error('Socket connection error:', error);
+            });
+
+            this.socket.on('disconnect', (reason) => {
+                console.log('Disconnected from WebSocket server:', reason);
+            });
+
+        } catch (error) {
+            console.error('Socket initialization error:', error);
+        }
+    }
+
+    // ... rest of your class methods ...
+}
         
         // Initialize properties
         this.token = localStorage.getItem('token') || (this.user && this.user.token);
