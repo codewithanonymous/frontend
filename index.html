@@ -733,24 +733,45 @@
         function checkAuthStatus() {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const token = user?.token;
+            const currentPath = window.location.pathname;
             
+            // If we're on the login/signup page but already authenticated, go to feed
+            if (token && (currentPath.endsWith('index.html') || currentPath === '/')) {
+                console.log('Already authenticated, redirecting to feed');
+                window.location.href = '/feed.html';
+                return;
+            }
+            
+            // If we're on a protected page but not authenticated, redirect to login
+            if (!token && (currentPath.endsWith('feed.html') || currentPath === '/')) {
+                console.log('Not authenticated, redirecting to login');
+                window.location.href = '/index.html';
+                return;
+            }
+            
+            // Handle return URL if present
             if (token) {
-                // If user is already logged in, redirect to feed or return URL
                 const urlParams = new URLSearchParams(window.location.search);
                 let returnUrl = urlParams.get('returnUrl');
                 
-                // Validate return URL
-                if (!returnUrl || !returnUrl.startsWith('/')) {
-                    returnUrl = '/feed.html';
-                }
-                
-                try {
-                    // Ensure the return URL is a valid path
-                    new URL(returnUrl, window.location.origin);
-                    window.location.href = returnUrl;
-                } catch (e) {
-                    console.error('Invalid return URL:', e);
-                    window.location.href = '/feed.html';
+                if (returnUrl) {
+                    try {
+                        // Decode and validate the return URL
+                        returnUrl = decodeURIComponent(returnUrl);
+                        const url = new URL(returnUrl, window.location.origin);
+                        
+                        // Only allow relative URLs to our own domain
+                        if (url.origin === window.location.origin) {
+                            console.log('Redirecting to return URL:', returnUrl);
+                            window.location.href = returnUrl;
+                        } else {
+                            console.warn('Invalid return URL domain, defaulting to feed');
+                            window.location.href = '/feed.html';
+                        }
+                    } catch (e) {
+                        console.error('Invalid return URL, defaulting to feed:', e);
+                        window.location.href = '/feed.html';
+                    }
                 }
             }
         }
@@ -898,7 +919,6 @@
                         
                         if (response.ok) {
                             console.log('Login successful!');
-                            showMessage('Login successful!', false);
                             
                             // Store token with user data
                             const userData = {
@@ -908,21 +928,17 @@
                             localStorage.setItem('user', JSON.stringify(userData));
                             console.log('User data stored in localStorage:', userData);
                             
-                            // Redirect to feed after successful login
-                            console.log('Login successful, redirecting to feed...');
-                            // Use replace instead of href to prevent back button issues
-                            window.location.replace('/feed');
+                            // Show success message and redirect to feed
+                            showMessage('Login successful!', false);
+                            console.log('Redirecting to feed...');
+                            window.location.href = '/feed.html';
                         } else {
+                            // Handle login error
                             console.error('Login failed:', data);
                             showErrorPopup(data.message || 'Login failed. Please try again.');
                         }
                     } catch (error) {
-                        console.error('Login error caught:', error);
-                        console.error('Error details:', {
-                            name: error.name,
-                            message: error.message,
-                            stack: error.stack
-                        });
+                        console.error('Login error:', error);
                         showErrorPopup('An error occurred. Please try again.');
                     }
                     
