@@ -12,19 +12,19 @@ class SnapFeed {
         this.token = user?.token;
         this.user = user;
         
-        // Check if we're already on the index page to prevent redirect loops
-        const isIndexPage = window.location.pathname.endsWith('index.html') || 
-                           window.location.pathname === '/' || 
-                           window.location.pathname === '';
+        // Get current page path
+        const currentPath = window.location.pathname;
+        const isFeedPage = currentPath.endsWith('feed.html') || currentPath.endsWith('feed');
         
-        if (!this.token) {
-            if (!isIndexPage) {
-                console.log('No authentication token found, redirecting to index.html');
-                window.location.href = '/index.html';
-            }
+        // Only redirect if we're on the feed page without authentication
+        if (isFeedPage && !this.token) {
+            console.log('Not authenticated, redirecting to index.html');
+            window.location.href = '/index.html';
             return;
-        } else if (isIndexPage) {
-            // If we're on index.html but already authenticated, go to feed
+        }
+        
+        // If we have a token and we're on the index page, redirect to feed
+        if (this.token && (currentPath.endsWith('index.html') || currentPath === '/' || currentPath === '')) {
             console.log('Already authenticated, redirecting to feed');
             window.location.href = '/feed.html';
             return;
