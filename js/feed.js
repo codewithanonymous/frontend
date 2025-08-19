@@ -3,38 +3,58 @@
 const API_BASE_URL = window.config ? config.API_BASE_URL : '';
 
 // Socket.IO connection URL - Use your Render backend URL directly
-const SOCKET_URL = 'https://kitsflickbackend.onrender.com'; // Replace with your actual backend URL
+const SOCKET_URL = 'https://kitsflickbackend.onrender.com';
 
 class SnapFeed {
     constructor() {
+        // Check authentication first
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.token = user?.token;
+        this.user = user;
+        
+        // Check if we're already on the index page to prevent redirect loops
+        const isIndexPage = window.location.pathname.endsWith('index.html') || 
+                           window.location.pathname === '/' || 
+                           window.location.pathname === '';
+        
+        if (!this.token) {
+            if (!isIndexPage) {
+                console.log('No authentication token found, redirecting to index.html');
+                window.location.href = '/index.html';
+            }
+            return;
+        } else if (isIndexPage) {
+            // If we're on index.html but already authenticated, go to feed
+            console.log('Already authenticated, redirecting to feed');
+            window.location.href = '/feed.html';
+            return;
+        }
+
         // Initialize properties
-        this.token = localStorage.getItem('token') || (this.user && this.user.token);
         this.socket = null;
         this.viewedSnaps = new Set();
         this.isLoading = false;
         this.hasMore = true;
         this.page = 1;
         this.pageSize = 10;
-        this.user = JSON.parse(localStorage.getItem('user') || '{}');
         
-        // Authentication check
-        if (!this.token) {
-            window.location.href = '/';
-            return;
-        }
-        
+        console.log('Initializing feed for user:', this.user.username || 'Unknown');
         this.initializeSocket();
         this.init();
     }
 
     init() {
-        this.setupRefreshButton();
-        this.setupScrollTracking();
-        this.loadFeed();
-        this.displayUsername();
+        try {
+            this.setupRefreshButton();
+            this.setupScrollTracking();
+            this.loadFeed();
+            this.displayUsername();
+        } catch (error) {
+            console.error('Error initializing feed:', error);
+        }
     }
 
-      initializeSocket() {
+    initializeSocket() {
         try {
             console.log('Initializing socket connection to:', SOCKET_URL);
             this.socket = io(SOCKET_URL, {
@@ -223,11 +243,11 @@ class SnapFeed {
                 const errorData = await response.json().catch(() => ({}));
                 console.error('API Error:', errorData);
                 
-                if (response.status === 401) {
-                    console.log('Authentication failed, redirecting to login.');
+                if (response.status === 401 || response.status === 403) {
+                    console.log('Authentication failed, redirecting to index.html');
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
-                    window.location.href = '/';
+                    window.location.href = '/index.html';
                     return;
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -763,7 +783,8 @@ class SnapFeed {
             this.socket.disconnect();
         }
         
-        window.location.href = '/';
+        // Redirect to index.html after logout
+        window.location.href = '/index.html';
     }
 
     showError(message) {
@@ -778,7 +799,40 @@ class SnapFeed {
     }
 }
 
+// Global error handler to prevent uncaught errors from causing infinite loops
+window.addEventListener('error', (event) => {
+    console.error('Global error caught:', event.error);
+    event.preventDefault();
+    return false;
+});
+
+// Track initialization state
+let isInitializing = false;
+
 // Initialize feed when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.snapFeedInstance = new SnapFeed();
+    // Prevent multiple initializations
+    if (isInitializing) {
+        console.log('Initialization already in progress');
+        return;
+    }
+    
+    isInitializing = true;
+    
+    try {
+        // Only create instance if not already created
+        if (!window.snapFeedInstance) {
+            console.log('Creating new SnapFeed instance');
+            window.snapFeedInstance = new SnapFeed();
+        } else if (window.snapFeedInstance.init) {
+            console.log('Reinitializing existing SnapFeed instance');
+            window.snapFeedInstance.init();
+        }
+    } catch (error) {
+        console.error('Error during initialization:', error);
+        // Prevent infinite loops by showing error to user
+        alert('Failed to initialize the application. Please refresh the page.');
+    } finally {
+        isInitializing = false;
+    }
 });
