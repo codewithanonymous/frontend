@@ -34,12 +34,16 @@ class SnapFeed {
         this.displayUsername();
     }
 
-    initializeSocket() {
+      initializeSocket() {
         try {
             console.log('Initializing socket connection to:', SOCKET_URL);
             this.socket = io(SOCKET_URL, {
                 path: '/socket.io/',
                 transports: ['websocket', 'polling'],
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                timeout: 20000,
                 withCredentials: true,
                 auth: {
                     token: this.token
