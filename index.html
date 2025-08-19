@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -735,42 +736,55 @@
             const token = user?.token;
             const currentPath = window.location.pathname;
             
-            // If we're on the login/signup page but already authenticated, go to feed
-            if (token && (currentPath.endsWith('index.html') || currentPath === '/')) {
-                console.log('Already authenticated, redirecting to feed');
-                window.location.href = '/feed.html';
+            console.log('Auth check - Current path:', currentPath);
+            console.log('Auth check - User token exists:', !!token);
+            
+            // Handle index/login page
+            if (currentPath === '/' || currentPath.endsWith('index.html')) {
+                if (token) {
+                    console.log('Authenticated user on login page, redirecting to feed');
+                    window.location.replace('/feed.html');
+                } else {
+                    console.log('Not authenticated, showing login page');
+                }
                 return;
             }
             
-            // If we're on a protected page but not authenticated, redirect to login
-            if (!token && (currentPath.endsWith('feed.html') || currentPath === '/')) {
-                console.log('Not authenticated, redirecting to login');
-                window.location.href = '/index.html';
+            // Handle protected pages (feed, upload, etc.)
+            const protectedPages = ['/feed.html', '/upload.html', '/admin.html'];
+            const isProtectedPage = protectedPages.some(page => currentPath.endsWith(page));
+            
+            if (isProtectedPage && !token) {
+                console.log('Unauthenticated access to protected page, redirecting to login');
+                window.location.replace('/index.html');
                 return;
             }
             
-            // Handle return URL if present
+            // Handle return URL if present (only for authenticated users)
             if (token) {
                 const urlParams = new URLSearchParams(window.location.search);
-                let returnUrl = urlParams.get('returnUrl');
+                const returnUrl = urlParams.get('returnUrl');
                 
                 if (returnUrl) {
                     try {
                         // Decode and validate the return URL
-                        returnUrl = decodeURIComponent(returnUrl);
-                        const url = new URL(returnUrl, window.location.origin);
+                        const decodedUrl = decodeURIComponent(returnUrl);
+                        const url = new URL(decodedUrl, window.location.origin);
                         
-                        // Only allow relative URLs to our own domain
-                        if (url.origin === window.location.origin) {
-                            console.log('Redirecting to return URL:', returnUrl);
-                            window.location.href = returnUrl;
+                        // Only allow relative URLs to our own domain and not to login page
+                        if (url.origin === window.location.origin && 
+                            !url.pathname.endsWith('index.html') && 
+                            url.pathname !== '/') {
+                            
+                            console.log('Redirecting to return URL:', decodedUrl);
+                            window.location.replace(decodedUrl);
                         } else {
-                            console.warn('Invalid return URL domain, defaulting to feed');
-                            window.location.href = '/feed.html';
+                            console.warn('Invalid return URL, defaulting to feed');
+                            window.location.replace('/feed.html');
                         }
                     } catch (e) {
                         console.error('Invalid return URL, defaulting to feed:', e);
-                        window.location.href = '/feed.html';
+                        window.location.replace('/feed.html');
                     }
                 }
             }
